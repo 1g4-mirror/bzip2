@@ -441,7 +441,12 @@ Int32 main ( Int32 argc, Char** argv )
    wrBlock = 0;
    while (True) {
       b = bsGetBit(bsIn);
-      if (b == 2) break;
+      if (b == 2) {
+         if (outFile != NULL) {
+            bsClose(bsWr);
+         }
+         break;
+      }
       buffHi = (buffHi << 1) | (buffLo >> 31);
       buffLo = (buffLo << 1) | (b & 1);
       if (bitsRead == 47+rbStart[wrBlock]) 
