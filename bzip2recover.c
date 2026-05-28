@@ -202,7 +202,9 @@ static Int32 bsGetBit ( BitStream* bs )
       bs->buffLive --;
       return ( ((bs->buffer) >> (bs->buffLive)) & 0x1 );
    } else {
-      Int32 retVal = getc ( bs->handle );
+      Int32 retVal;
+      errno = 0;
+      retVal = getc ( bs->handle );
       if ( retVal == EOF ) {
          if (errno != 0) readError();
          return 2;
