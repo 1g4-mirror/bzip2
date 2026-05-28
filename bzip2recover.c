@@ -394,6 +394,7 @@ Int32 main ( Int32 argc, Char** argv )
             bEnd[currBlock] = 0;
          }
          if (currBlock > 0 &&
+	     bEnd[currBlock] >= bStart[currBlock] &&
 	     (bEnd[currBlock] - bStart[currBlock]) >= 130) {
             fprintf ( stderr, "   block %d runs from " MaybeUInt64_FMT 
                               " to " MaybeUInt64_FMT "\n",
