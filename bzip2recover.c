@@ -508,6 +508,8 @@ Int32 main ( Int32 argc, Char** argv )
       }
    }
 
+   bsClose ( bsIn );
+
    fprintf ( stderr, "%s: finished\n", progName );
    return 0;
 }
