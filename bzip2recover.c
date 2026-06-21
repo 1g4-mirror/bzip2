@@ -311,7 +311,10 @@ Int32 main ( Int32 argc, Char** argv )
    UInt32      buffHi, buffLo, blockCRC;
    Char*       p;
 
-   strncpy ( progName, argv[0], BZ_MAX_FILENAME-1);
+   if (argc >= 1 && argv[0] != NULL)
+      strncpy ( progName, argv[0], BZ_MAX_FILENAME-1);
+   else
+      strncpy ( progName, "bzip2recover", BZ_MAX_FILENAME-1);
    progName[BZ_MAX_FILENAME-1]='\0';
    inFileName[0] = outFileName[0] = 0;
 
