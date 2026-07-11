@@ -25,6 +25,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef _WIN32
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+
 
 /* This program records bit locations in the file to be recovered.
    That means that if 64-bit ints are not supported, we will not
@@ -272,6 +278,30 @@ static Bool endsInBz2 ( Char* name )
 }
 
 
+/*---------------------------------------------*/
+/* Create an output block file safely.  The block file names are
+   predictable and are written into the directory of the (possibly
+   untrusted) input file, so a plain fopen() would follow a
+   pre-planted symlink and overwrite an arbitrary file, or silently
+   clobber an existing one.  Mirror fopen_output_safely() in bzip2.c:
+   create with O_EXCL and restrictive permissions so we never follow a
+   symlink and never overwrite an existing file. */
+static FILE* fopenOutputSafely ( Char* name )
+{
+#ifdef _WIN32
+   return fopen ( name, "wb" );
+#else
+   FILE* fp;
+   Int32 fh;
+   fh = open ( name, O_WRONLY|O_CREAT|O_EXCL, S_IWUSR|S_IRUSR );
+   if (fh == -1) return NULL;
+   fp = fdopen ( fh, "wb" );
+   if (fp == NULL) close ( fh );
+   return fp;
+#endif
+}
+
+
 /*---------------------------------------------------*/
 /*---                                             ---*/
 /*---------------------------------------------------*/
@@ -499,7 +529,7 @@ Int32 main ( Int32 argc, Char** argv )
          fprintf ( stderr, "   writing block %d to `%s' ...\n",
                            wrBlock+1, outFileName );
 
-         outFile = fopen ( outFileName, "wb" );
+         outFile = fopenOutputSafely ( outFileName );
          if (outFile == NULL) {
             fprintf ( stderr, "%s: can't write `%s'\n",
                       progName, outFileName );
